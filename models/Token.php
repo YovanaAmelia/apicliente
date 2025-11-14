@@ -82,6 +82,4 @@ class Token {
         return $data;
     }
 }
-?>
-
-    
+?>  

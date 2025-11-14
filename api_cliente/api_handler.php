@@ -1,55 +1,59 @@
 <?php
-// api_cliente/api_handler.php (CLIENTEAPI)
 header('Content-Type: application/json');
 require_once __DIR__ . '/../controllers/TokenController.php';
 
-// Obtener el token activo de la base de datos
+// Obtener token activo del clienteAPI
 $tokenController = new TokenController();
 $token = $tokenController->obtenerTokenActivo();
 
-if (empty($token)) {
+if (!$token) {
     echo json_encode([
         'status' => false,
-        'type' => 'error',
-        'msg' => 'No hay un token activo configurado en la base de datos.'
+        'type'   => 'error',
+        'msg'    => 'No hay un token activo en la base de datos.'
     ]);
     exit();
 }
 
-// Validar el token en HOTELESAPI
+// Validar token directo en HOTELESAPI
 $validacion = $tokenController->validarTokenEnHOTELESAPI($token);
 
-if (empty($validacion) || !$validacion['status']) {
+if (!$validacion || !$validacion['status']) {
     echo json_encode([
         'status' => false,
-        'type' => $validacion['type'] ?? 'error',
-        'msg' => $validacion['msg'] ?? 'Error al validar el token en HOTELESAPI.'
+        'type'   => $validacion['type'] ?? 'error',
+        'msg'    => $validacion['msg'] ?? 'Error al validar token.'
     ]);
     exit();
 }
 
-// Obtener el término de búsqueda
+// Obtener búsqueda
 $search = $_POST['search'] ?? '';
 
-// Redirigir la petición al API de HOTELESAPI
-$url = 'http://localhost/hotelesAPI/api_handler.php?action=buscarHoteles';
+// Enviar solicitud a HOTELESAPI
+$url = "http://localhost/hotelesAPI/api_handler.php";
+
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(['token' => $token, 'search' => $search]));
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+    'action' => 'buscarHoteles',
+    'token'  => $token,
+    'search' => $search
+]));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
 $response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-// Devolver la respuesta del API de HOTELESAPI
-if ($httpCode === 200) {
+if ($http === 200) {
     echo $response;
 } else {
     echo json_encode([
         'status' => false,
-        'type' => 'error',
-        'msg' => 'Error al conectar con el API de HOTELESAPI.'
+        'type'   => 'error',
+        'msg'    => 'Error al conectar con HOTELESAPI.'
     ]);
 }
 ?>
