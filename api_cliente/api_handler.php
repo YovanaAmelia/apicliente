@@ -1,38 +1,40 @@
-<?php
+<?php 
+// api_cliente/api_handler.php
 header('Content-Type: application/json');
+
 require_once __DIR__ . '/../controllers/TokenController.php';
 
-// Obtener token activo del clienteAPI
 $tokenController = new TokenController();
 $token = $tokenController->obtenerTokenActivo();
 
-if (!$token) {
+if (empty($token)) {
     echo json_encode([
         'status' => false,
-        'type'   => 'error',
-        'msg'    => 'No hay un token activo en la base de datos.'
+        'type' => 'error',
+        'msg' => 'No hay un token activo configurado en la base de datos.'
     ]);
     exit();
 }
 
-// Validar token directo en HOTELESAPI
+// Validar token en HOTELESAPI
 $validacion = $tokenController->validarTokenEnHOTELESAPI($token);
 
-if (!$validacion || !$validacion['status']) {
+if (empty($validacion) || !$validacion['status']) {
     echo json_encode([
         'status' => false,
-        'type'   => $validacion['type'] ?? 'error',
-        'msg'    => $validacion['msg'] ?? 'Error al validar token.'
+        'type' => $validacion['type'] ?? 'error',
+        'msg' => $validacion['msg'] ?? 'Error al validar el token en HOTELESAPI.'
     ]);
     exit();
 }
 
-// Obtener búsqueda
+// Búsqueda desde el buscador
 $search = $_POST['search'] ?? '';
 
-// Enviar solicitud a HOTELESAPI
-$url = "http://localhost/hotelesAPI/api_handler.php";
+// URL DEL SERVIDOR CPANEL
+$url = 'https://localhost/AdminHotel/api_handler.php';
 
+// Enviar petición a HOTELESAPI
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_POST, true);
@@ -44,16 +46,17 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 $response = curl_exec($ch);
-$http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-if ($http === 200) {
+// Respuesta del API
+if ($httpCode === 200) {
     echo $response;
 } else {
     echo json_encode([
         'status' => false,
-        'type'   => 'error',
-        'msg'    => 'Error al conectar con HOTELESAPI.'
+        'type' => 'error',
+        'msg' => 'Error al conectar con el API de HOTELESAPI.'
     ]);
 }
 ?>
