@@ -7,7 +7,7 @@ define('DB_PASSWORD', '');
 define('DB_CHARSET', 'utf8mb4');
 
 // Configuración de rutas base
-define('BASE_URL', 'http://localhost/clienteapi/');
+define('BASE_URL', 'http://localhost/clienteapiy/');
 
 define('BASE_PATH', __DIR__ . '/../');
 

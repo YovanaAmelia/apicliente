@@ -24,9 +24,14 @@ class TokenController {
         return $this->tokenModel->actualizarToken($id_client_api, $nuevo_token);
     }
 
-    // Obtener token por token
-    public function obtenerTokenPorToken($token) {
-        return $this->tokenModel->obtenerTokenPorToken($token);
+     // Obtener el token activo
+    public function obtenerTokenActivo() {
+        return $this->tokenModel->obtenerTokenActivo();
+    }
+
+    // Validar el token en HOTELESAPI
+    public function validarTokenEnHOTELESAPI($token) {
+        return $this->tokenModel->validarTokenEnHOTELESAPI($token);
     }
 }
 ?>

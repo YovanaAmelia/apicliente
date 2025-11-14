@@ -21,7 +21,6 @@
                 </h2>
             </div>
             <form id="frmApi">
-                <input type="hidden" id="token" value="a848e0b576cd0aed69a01810b0ab6227-20251113-01">
                 <div class="search-box">
                     <input
                         type="text"
@@ -36,6 +35,11 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('search').oninput = buscarHoteles;
+        });
+    </script>
     <script src="js/api.js"></script>
 </body>
 </html>
